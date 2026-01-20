@@ -1,12 +1,28 @@
+const CACHE_NAME = "mega-sena-cache-v1";
+const FILES_TO_CACHE = [
+  "./index.html",      // OU ./megasena.html (veja observação abaixo)
+  "./manifest.json",
+  "./service-worker.js"
+];
+
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open("mega-sena-cache").then(cache => {
-      return cache.addAll([
-        "./",
-        "./megasena.html"
-      ]);
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(FILES_TO_CACHE);
     })
   );
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      )
+    )
+  );
+  self.clients.claim();
 });
 
 self.addEventListener("fetch", event => {
