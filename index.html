@@ -164,27 +164,27 @@
       resultDiv.innerHTML = "";
     }
 
-    const API_URL =
-      "https://corsproxy.io/?https://servicebus2.caixa.gov.br/portaldeloterias/api/megasena";
+    const API_URL = "https://loteriascaixa-api.herokuapp.com/api/megasena";
 
     async function carregarHistorico() {
-      try {
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error("Erro na API");
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error("Erro na API");
 
-        const data = await res.json();
+    const data = await res.json();
 
-        const concursos = data.listaResultados.map(c => ({
-          dezenas: c.listaDezenas.map(n => parseInt(n))
-        }));
+    const concursos = data.map(c => ({
+      dezenas: c.dezenas.map(n => parseInt(n))
+    }));
 
-        localStorage.setItem("megaSenaCache", JSON.stringify(concursos));
-        return concursos;
-      } catch {
-        const cache = localStorage.getItem("megaSenaCache");
-        return cache ? JSON.parse(cache) : [];
-      }
-    }
+    localStorage.setItem("megaSenaCache", JSON.stringify(concursos));
+    return concursos;
+  } catch (e) {
+    console.warn("Usando cache local", e);
+    const cache = localStorage.getItem("megaSenaCache");
+    return cache ? JSON.parse(cache) : [];
+  }
+}
 
     async function checkResults() {
       if (selectedNumbers.length < 6 || selectedNumbers.length > 20) {
